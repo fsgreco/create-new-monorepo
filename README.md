@@ -1,7 +1,9 @@
 # Create new monorepo
 This project is a starter CLI for scaffold new monorepos in a simpler way. It follows the Rapid Application Development (RAD) philosophy.  
 
-The resulting monorepo will be managed by `npm` but you can set any application you want (even with apps in PHP or Python).
+The resulting monorepo will be managed by `npm` but you can set any application you want (even with apps in PHP or Python).  
+
+Please notice: this is still in beta (v0.1.0)
 
 ## Usage
 
