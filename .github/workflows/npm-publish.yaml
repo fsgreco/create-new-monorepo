@@ -9,7 +9,7 @@ jobs:
     steps:
 
       - name: Checkout project
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
         
       - name: Publish on npm
         id: publish-npm
