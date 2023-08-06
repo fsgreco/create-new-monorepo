@@ -13,7 +13,7 @@ jobs:
         
       - name: Publish on npm
         id: publish-npm
-        uses: JS-DevTools/npm-publish@v2
+        uses: JS-DevTools/npm-publish@v2.2.1
         with:
           token: ${{ secrets.NPM_TOKEN }}
 
@@ -22,5 +22,5 @@ jobs:
         run: |
           curl -s \
           -d "chat_id=${{ secrets.CHAT_ID }}" \
-          -d "text=📦 *${{ github.repository }}*:%0ANew version published v${{ steps.publish-npm.outputs.version }}" \
-          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage?parse_mode=MarkdownV2 > /dev/null
+          -d "text=📦 <strong>${{ github.repository }}</strong>:%0ANew version published <pre>v${{ steps.publish-npm.outputs.version }}</pre>" \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage?parse_mode=html > /dev/null
