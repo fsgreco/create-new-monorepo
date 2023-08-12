@@ -14,8 +14,8 @@ const chosenDir =  options.project || commands[0]
 const chosenBackend = options.backend
 const chosenFrontend = options.frontend
 
-console.debug({chosenDir, choosesDefault, chosenBackend, chosenFrontend})
-console.log('\n')
+//console.debug({chosenDir, choosesDefault, chosenBackend, chosenFrontend})
+//console.log('\n')
 
 // The first argument will be the project name. or --project or -p also
 if (chosenDir) {

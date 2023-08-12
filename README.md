@@ -3,15 +3,21 @@ This project is a starter CLI for scaffold new monorepos in a simpler way. It fo
 
 The resulting monorepo will be managed by `npm` but you can set any application you want (even with apps in PHP or Python).  
 
-Please notice: this is still in beta (v0.1.0)
+Please notice: this is still in beta (v1.0.3)
 
 ## Usage
 
 You don't need to install anything. 
 Simply run this on your terminal and answer the questions: 
 ```sh
-npm create new-monorepo
+npm create new-monorepo <project-name>
 ```
+
+You can pass options after `--` to avoid interactivity: 
+```sh
+npm create new-monorepo <project-name> -- -b django -f react
+```
+This will create a `django` app under `/backend` and a `react` app under `/frontend` directory.
 
 Then, after the scaffold simply run
 ```
