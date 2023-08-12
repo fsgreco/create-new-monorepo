@@ -14,26 +14,7 @@ const chosenDir =  options.project || commands[0]
 const chosenBackend = options.backend
 const chosenFrontend = options.frontend
 
-
-// TODO - add gitignore 
-// USE chalk to add color to workspaces main and secondary 
-
-// Add control to stablish if user has the binary and it works (check the exit status)
-/* So first run the `command -v` and then also some unuseful command with > /dev/null 2>&1 , if result is not 0 then it's not ok
-
-child_process.spawn('docker', ['info'])
-	.on('exit', c => console.log('child exit code (spawn)', c))
-
-
-	also check what happens if you use stdio 'inherit' with spawn it should output result on terminal, otherwise it will be silent.
-
-	metti sta cosa del spawn nel how to - se gli dai un terzo argomento `{stdio: 'inherit'}` lui farà vedere l'output nel terminale (cioè nel processo sopra quindi quello primario):
-	```js
-	let cp = require('node:child_process')
-	cp.spawn('docker', ['info' ], {stdio: 'inherit'})
-	```
-
-*/
+//console.debug({chosenDir, choosesDefault, chosenBackend, chosenFrontend})
 
 // The first argument will be the project name. or --project or -p also
 if (chosenDir) {
