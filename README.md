@@ -3,27 +3,52 @@ This project is a starter CLI for scaffold new monorepos in a simpler way. It fo
 
 The resulting monorepo will be managed by `npm` but you can set any application you want (even with apps in PHP or Python).  
 
-Please notice: this is still in beta (v1.0.3)
 
 ## Usage
 
-You don't need to install anything. 
-Simply run this on your terminal and answer the questions: 
+**You don't need to install anything**.  
+Simply run this command on your terminal and answer the questions: 
 ```sh
 npm create new-monorepo <project-name>
 ```
 
-You can pass options after `--` to avoid interactivity: 
-```sh
-npm create new-monorepo <project-name> -- -b django -f react
-```
-This will create a `django` app under `/backend` and a `react` app under `/frontend` directory.
-
-Then, after the scaffold simply run
+Then, after the scaffold simply run:
 ```
 npm start
 ```
 It will launch the frontend and backend server.
 
+![Screenshot Demo](screenshot-demo.png)
+
+## Available options
+
+You can pass options preceeded by `--` to avoid interactivity: 
+```sh
+npm create new-monorepo <project-name> -- -b django -f react
+```
+This will create a `django` app under `/backend` and a `react` app under `/frontend` directory.
+
+The available options are:
+
+|   Command  | shorthand |                                                             example                                                    |
+|:----------:|:---------:|------------------------------------------------------------------------------------------------------------------------|
+|  --project |     -p    | `npm create new-monorepo -- -p my-project`  <br>Alternatively use an argument:<br>`npm create new-monorepo my-project` |
+| --frontend |     -f    | `npm create new-monorepo my-project -- -f react`                                                                       |
+|  --backend |     -b    | `npm create new-monorepo my-project -- -b django`                                                                      |
+
+### Available templates:
+At the moment this are the available templates: 
+
+| Frontend                                                                      |
+|-------------------------------------------------------------------------------|
+| `vanilla`, `react`, `vue`, `svelte`, `solid`, `qwik`, `preact`, `lit`, `none` |
+
+| Backend                                                                       |
+|-------------------------------------------------------------------------------|
+| `laravel`, `django`, `none`                                                   |
+
 ## Notes: 
+
+Please notice: this is still in beta (v1.0.4)
+
 The project still lacks of any kind of validation (they will be set in the future). e.g. If you choose `django` or `laravel` as a backend service you will need to have installed the requirements (either `python` or `php` & `composer` in the device).
