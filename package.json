@@ -1,6 +1,6 @@
 {
   "name": "create-new-monorepo",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A CLI for RAD (Rapid Application Development), helps you to start a Node.js Monorepo projects.",
   "type": "module",
   "keywords": [
