@@ -20,7 +20,7 @@ const chosenFrontend = options.frontend
 // The first argument will be the project name. or --project or -p also
 if (chosenDir) {
 	const directory = options.project || commands[0]
-	console.log(`Hai scelto ${ inBlueBold( directory ) } - creo directory...\n`)
+	console.log(`Your project will be called: ${ inBlueBold( directory ) } - creating directory...\n`)
 	await fs.mkdir(directory, { recursive: true })
 	process.chdir( directory )
 }
