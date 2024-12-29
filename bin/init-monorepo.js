@@ -2,10 +2,10 @@
 import fs from 'node:fs/promises'
 import inquirer from "inquirer"
 import ora from 'ora'
-import { setNpmScript, spawnAsync } from "../utils/functions.js"
+import { checkBinary, setNpmScript, spawnAsync } from "../utils/functions.js"
 import { createPackageJson, initTokens, initFrontendOfChoice, initBackendOfChoice } from "../helpers/scaffold-functions.js"
 import { options, commands } from "../helpers/arguments.js"
-import { checkmark, inBlueBold, inGoldBold, inGreenBold, printNewLine, printSeparator } from "../utils/prints.js"
+import { checkmark, inBlueBold, inGoldBold, inGreenBold, inRedBold, printNewLine, printSeparator } from "../utils/prints.js"
 
 // TODO if argument is --default or -d do not ask any question
 const choosesDefault = options.default 
@@ -76,6 +76,22 @@ if (chosenBackend && backends.includes(chosenBackend)) {
 	backend.choice = chosenBackend
 } else {
 	backend = await inquirer.prompt({type: 'list', name: 'choice', message: 'Choose your backend:', choices: backends, default: 'django'})
+}
+
+if ( backend.choice === 'laravel' ) {
+	let binaryExist = checkBinary('composer')
+	if (!binaryExist) {
+		console.error(inRedBold('Error: Please install php and composer to use Laravel'));
+		process.exit(1)
+	}
+}
+
+if ( backend.choice === 'django' ) {
+	let binaryExist = checkBinary('django-admin')
+	if (!binaryExist) {
+		console.error(inRedBold("Error: Please install Python and Django to proceed."))
+		process.exit(1)
+	}
 }
 
 // Choose your frontend ['vanilla', 'react', 'vue', 'svelte', 'solid', 'quick']

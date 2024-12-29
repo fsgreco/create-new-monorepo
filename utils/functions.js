@@ -1,4 +1,4 @@
-import { spawn, exec } from 'node:child_process'
+import { spawn, exec, spawnSync} from 'node:child_process'
 import { promisify } from 'node:util'
 
 /**
@@ -52,4 +52,16 @@ export function spawnAsync(command, args) {
       }
     });
   });
+}
+
+
+/**
+ * MIT © Santiago Greco - Apr 5, 2023 - fsgreco@hey.com
+ * Check if binary exist using `command -v` POSIX compliance function.
+ * @param {string} bin the binary command as a string
+ * @returns {boolean} `true` if is present, `false` if not.
+ */
+export function checkBinary(bin) {
+	let binary = spawnSync('command', ['-v',bin], {shell: true})
+	return !Boolean(binary.status)
 }
