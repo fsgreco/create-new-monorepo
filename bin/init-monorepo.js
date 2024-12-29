@@ -36,7 +36,7 @@ let firstRound = [
 		type: 'confirm', 
 		name: 'change_workspaces', 
 		message: "Default workspaces will be " + inGoldBold( Object.values(workspaces)) +`
-	${options.project || commands[0] || '.'}
+	${ chosenDir || '.'}
 	├── ${inGoldBold(Object.values(workspaces)[0])}/
 	│   ├── backend
 	│   └── frontend

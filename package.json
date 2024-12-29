@@ -16,6 +16,10 @@
     "react"
   ],
   "author": "Santiago Greco <fsgreco@fastmail.com> (https://github.com/fsgreco)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fsgreco/create-new-monorepo.git"
+  },
   "license": "MIT",
   "bin": {
     "create-new-monorepo": "./bin/init-monorepo.js"
