@@ -33,11 +33,11 @@ async function initTokens( workspace = 'utils', packageName = 'tokens', scope = 
 
 let djangoInnerScripts = [
 	{name: 'boot:startproject', cmd: 'django-admin startproject project .' },
-	{name: 'boot:startapp', cmd: 'python manage.py startapp api' },
+	{name: 'boot:startapp', cmd: 'python3 manage.py startapp api' },
 	{name: 'prepare', cmd: 'if [ ! -d \"project\" ]; then npm run boot:startproject && npm run boot:startapp; fi' },
-	{name: 'migrate', cmd: 'python manage.py migrate' },
-	{name: 'migrations', cmd: 'python manage.py makemigrations' },
-	{name: 'dev', cmd: 'python manage.py runserver 8001' },
+	{name: 'migrate', cmd: 'python3 manage.py migrate' },
+	{name: 'migrations', cmd: 'python3 manage.py makemigrations' },
+	{name: 'dev', cmd: 'python3 manage.py runserver 8001' },
 	{name: 'stop', cmd: 'pkill -f \'manage.py runserver 8001\''},
 	{name: 'start', cmd: 'npm run stop > /dev/null 2>&1 ; npm run migrate && npm run dev' },
 ]
