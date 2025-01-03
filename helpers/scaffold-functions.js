@@ -41,30 +41,52 @@ let djangoInnerScripts = [
 	{name: 'stop', cmd: 'pkill -f \'manage.py runserver 8001\''},
 	{name: 'start', cmd: 'npm run stop > /dev/null 2>&1 ; npm run migrate && npm run dev' },
 ]
+// TODO create laravel.scaffold to separate compose from innerScripts logic
 let laravelInnerScript = [
 	{ name: 'boot:startapp', cmd:'composer create-project laravel/laravel api' },
 	{ name: 'prepare', cmd: 'if [ ! -d \"api\" ]; then npm run boot:startapp ; fi' },
 	{ name: 'stop', cmd: 'lsof -t -i tcp:8001 | xargs kill -9'},
 	{ name: 'start', cmd: 'npm run stop > /dev/null 2>&1 ; cd api && php artisan serve --port=8001'}
 ]
+
+let fastify = {
+	scaffold: ['npx fastify-cli generate . --esm --integrate'],
+	innerScripts: [
+		// { name: 'prepare', cmd: 'if [ ! -d \"routes\" ]; then fastify generate . --integrate --esm && npm i ; fi' },
+	] // fastify already creates an npm start script
+}
+
+
 let backendScripts = new Map([
 	[ 'laravel', laravelInnerScript ],
-	[ 'django', djangoInnerScripts ]
+	[ 'django', djangoInnerScripts ],
+	[ 'fastify', fastify.innerScripts ],
 ])
 
 async function initBackendOfChoice( {workspace, choice = 'django', packageName = 'backend' } = {} ){
 
 	let workspaceCmds = [
 		`npm init -y -w ${workspace}/${packageName}`,
+		`npm pkg set type=module -w ${packageName}`,
 		`npm pkg delete scripts.test main keywords -w ${packageName}`,
 	]
 	for (let cmd of workspaceCmds) {
 		await execAsync(cmd)
 	}
-	
+
+	if (choice === 'fastify') {
+		for (let cmd of fastify.scaffold) {
+			await execAsync(`cd ${workspace}/${packageName} && ${cmd}`)
+		}
+	}
+
 	let innerScripts = backendScripts.get(choice)
-	for ( let script of innerScripts ) {
-		await setNpmScript({...script, packageName })
+	if (innerScripts) {
+		for ( let script of innerScripts ) {
+			await setNpmScript({...script, packageName })
+		}
+	} else {
+		console.error(`\nCouldn't find scaffolding scripts for ${choice}, please notify this to mantainer.`)
 	}
 
 	await setNpmScript({name: `start:${packageName}`, cmd: `npm start -w ${packageName}`})

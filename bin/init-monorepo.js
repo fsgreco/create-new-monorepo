@@ -69,7 +69,7 @@ Proceeding...\n`)
 printNewLine()
 
 // Choose your backend ['laravel', 'django']
-let backends = ['laravel', 'django', 'none']
+let backends = ['laravel', 'django', 'fastify', 'none']
 let backend 
 if (chosenBackend && backends.includes(chosenBackend)) {
 	backend = {}
@@ -81,7 +81,7 @@ if (chosenBackend && backends.includes(chosenBackend)) {
 if ( backend.choice === 'laravel' ) {
 	let binaryExist = checkBinary('composer')
 	if (!binaryExist) {
-		console.error(inRedBold('Error: Please install php and composer to use Laravel'));
+		console.error(inRedBold('Error: Please install php and composer to use Laravel.'))
 		process.exit(1)
 	}
 }
@@ -129,24 +129,33 @@ try {
 		spinner.succeed(`Created ${inGreenBold( frontend.choice) } frontend package (with Vite).\n`)
 	}
 
+	let initInstructions = [chosenDir && `cd ${chosenDir}`]
+
 	if ( !(frontend.choice === 'none' && backend.choice === 'none')) {
 		// main scaffolding process is done. Do you want to install depencencies or you'll do it by hand
 		let installDeps = await inquirer.prompt({ 
 			type: 'confirm', 
 			name: 'answer', 
-			message: "Main scaffolding process is done. Do you want to install depencencies right away?"
+			message: "Main scaffolding process is done.\nDo you want to install depencencies right away?"
 		})
+
+		initInstructions.push(!installDeps.answer && `npm install`)
 
 		if (installDeps.answer === true) {
 			spinner.start('Installing dependencies...')
 			await spawnAsync('npm', ['install'])
-			await setNpmScript({ name: 'start', cmd: 'npm run start:backend & npm run start:frontend' })
 			spinner.succeed(`Initialized project and installed dependencies.`)
 		}
+
+		// TODO create last main 'start' better (check and switch whenever be and fe are none )
+		await setNpmScript({ name: 'start', cmd: 'npm run start:backend & npm run start:frontend' })
 	}
 
 	printSeparator()
-	console.info(`${checkmark} Everything done. Now simply run 'npm start' and happy development 🚀`)
+
+	initInstructions.push('npm start')
+	const instructions = initInstructions.filter(val => typeof val === 'string').join(' && ')
+	console.info(`${checkmark} Everything done.\nNow simply run ${inBlueBold(instructions)}.\nHappy development 🚀`)
 
 } catch (error) {
 	console.error(error)
@@ -164,18 +173,4 @@ try {
 /* TODOS */
 
 // TODO - add gitignore 
-
-// Add control to stablish if user has the binary and it works (check the exit status)
-/* So first run the `command -v` and then also some unuseful command with > /dev/null 2>&1 , if result is not 0 then it's not ok
-
-child_process.spawn('docker', ['info'])
-	.on('exit', c => console.log('child exit code (spawn)', c))
-
-	also check what happens if you use stdio 'inherit' with spawn it should output result on terminal, otherwise it will be silent.
-
-	metti sta cosa del spawn nel how to - se gli dai un terzo argomento `{stdio: 'inherit'}` lui farà vedere l'output nel terminale (cioè nel processo sopra quindi quello primario):
-	```js
-	let cp = require('node:child_process')
-	cp.spawn('docker', ['info' ], {stdio: 'inherit'})
-	```
-*/
+// TODO - generate readme file (customized according to what user choose)
