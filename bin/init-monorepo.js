@@ -132,11 +132,11 @@ try {
 	let initInstructions = [chosenDir && `cd ${chosenDir}`]
 
 	if ( !(frontend.choice === 'none' && backend.choice === 'none')) {
-		// main scaffolding process is done. Do you want to install depencencies or you'll do it by hand
+		// main scaffolding process is done. Do you want to install dependencies or you'll do it by hand
 		let installDeps = await inquirer.prompt({ 
 			type: 'confirm', 
 			name: 'answer', 
-			message: "Main scaffolding process is done.\nDo you want to install depencencies right away?"
+			message: "Main scaffolding process is done.\nDo you want to install dependencies right away?"
 		})
 
 		initInstructions.push(!installDeps.answer && `npm install`)
