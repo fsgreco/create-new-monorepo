@@ -13,7 +13,7 @@ npm create new-monorepo <project-name>
 ```
 
 Then, after the scaffold simply run:
-```
+```sh
 npm start
 ```
 It will launch the frontend and backend server.
@@ -45,7 +45,7 @@ At the moment this are the available templates:
 
 | Backend                                                                       |
 |-------------------------------------------------------------------------------|
-| `laravel`, `django`, `none`                                                   |
+| `laravel`, `django`, `fastify`, `none`                                        |
 
 ## Notes: 
 
