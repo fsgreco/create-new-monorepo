@@ -40,7 +40,8 @@
   },
   "scripts": {
     "postinstall": "lefthook install",
-    "normalize": "prettier --write '*.{js,ts,cjs,mjs,jsx,tsx}'",
-    "lint": "eslint . --fix"
+    "normalize": "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'",
+    "lint": "eslint . --fix",
+		"check": "npm run normalize && npm run lint"
   }
 }
