@@ -1,6 +1,6 @@
 {
   "name": "create-new-monorepo",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "A CLI for RAD (Rapid Application Development), helps you to start a Node.js Monorepo projects.",
   "type": "module",
   "keywords": [
@@ -42,6 +42,6 @@
     "postinstall": "lefthook install",
     "normalize": "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'",
     "lint": "eslint . --fix",
-		"check": "npm run normalize && npm run lint"
+    "check": "npm run normalize && npm run lint"
   }
 }
