@@ -1,4 +1,4 @@
-import { spawn, exec, spawnSync} from 'node:child_process'
+import { spawn, exec, spawnSync } from 'node:child_process'
 import { promisify } from 'node:util'
 
 /**
@@ -10,8 +10,8 @@ import { promisify } from 'node:util'
  * Add a script inside package.json scripts object
  * @param {scriptDefinition} script Define it's `name`, the command (`cmd`) and the package name`pkgName` (if the project resides in some workspace)
  */
-export async function setNpmScript({name, cmd, packageName = null }) {
-	let scriptAndWp = [`scripts.${name}=${cmd}`] 
+export async function setNpmScript({ name, cmd, packageName = null }) {
+	let scriptAndWp = [`scripts.${name}=${cmd}`]
 	if (packageName) scriptAndWp.push('-w', packageName)
 	await spawnAsync('npm', ['pkg', 'set', ...scriptAndWp])
 }
@@ -28,32 +28,31 @@ export const execAsync = promisify(exec)
  * @returns Promise object { stdout, stderr } or Rejected error
  */
 export function spawnAsync(command, args) {
-  return new Promise((resolve, reject) => {
-    const childProcess = spawn(command, args);
-    const result = {stdout: '', stderr: ''}
+	return new Promise((resolve, reject) => {
+		const childProcess = spawn(command, args)
+		const result = { stdout: '', stderr: '' }
 
-    childProcess.stdout.on('data', (data) => {
-      result.stdout += data;
-    });
+		childProcess.stdout.on('data', data => {
+			result.stdout += data
+		})
 
-    childProcess.stderr.on('data', (data) => {
-      result.stderr += data;
-    });
+		childProcess.stderr.on('data', data => {
+			result.stderr += data
+		})
 
-    childProcess.on('error', (err) => {
-      reject(err);
-    });
+		childProcess.on('error', err => {
+			reject(err)
+		})
 
-    childProcess.on('close', (code) => {
-      if (code === 0) {
-        resolve(result);
-      } else {
-        reject(new Error(`Process exited with code ${code}: ${result.stderr}`));
-      }
-    });
-  });
+		childProcess.on('close', code => {
+			if (code === 0) {
+				resolve(result)
+			} else {
+				reject(new Error(`Process exited with code ${code}: ${result.stderr}`))
+			}
+		})
+	})
 }
-
 
 /**
  * MIT © Santiago Greco - Apr 5, 2023 - fsgreco@hey.com
@@ -62,6 +61,6 @@ export function spawnAsync(command, args) {
  * @returns {boolean} `true` if is present, `false` if not.
  */
 export function checkBinary(bin) {
-	let binary = spawnSync('command', ['-v',bin], {shell: true})
-	return !Boolean(binary.status)
+	let binary = spawnSync('command', ['-v', bin], { shell: true })
+	return !binary.status
 }
