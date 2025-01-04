@@ -7,7 +7,7 @@ export default [
 	{ languageOptions: { globals: { ...globals.browser, ...globals.node } } },
 	pluginJs.configs.recommended,
 	{
-		ignores: ['node_modules', 'dist', 'public', '.nuxt'],
+		ignores: ['node_modules', '.github', 'dist', 'public'],
 		rules: {
 			'no-unused-vars': 'warn',
 			'no-useless-escape': 'off',
