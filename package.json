@@ -39,7 +39,7 @@
     "prettier": "^3.4.2"
   },
   "scripts": {
-    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then lefthook install; fi",
+    "postinstall": "if [ command -v lefthook > /dev/null ]; then lefthook install; fi",
     "normalize": "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'",
     "lint": "eslint . --fix",
     "check": "npm run normalize && npm run lint"
