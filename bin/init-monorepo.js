@@ -120,7 +120,7 @@ if (backend.choice === 'django') {
 }
 
 // Choose your frontend ['vanilla', 'react', 'vue', 'svelte', 'solid', 'quick']
-let frontends = ['vanilla', 'react', 'vue', 'svelte', 'solid', 'qwik', 'preact', 'lit', 'none']
+let frontends = ['vanilla', 'react', 'react-ts', 'vue', 'svelte', 'solid', 'qwik', 'preact', 'lit', 'none']
 let frontend
 if (chosenFrontend && frontends.includes(chosenFrontend)) {
 	frontend = {}
