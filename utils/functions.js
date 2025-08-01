@@ -1,6 +1,8 @@
 import { spawn, exec, spawnSync } from 'node:child_process'
 import { promisify } from 'node:util'
 
+/** @typedef {import("../helpers/types.js").GithubAPIResp} GithubApiResponse Response from Github */
+
 /**
  * The object that define a script to be inserted inside the package.json.
  * @typedef { {name: string, cmd: string, packageName?: string} } scriptDefinition
@@ -63,6 +65,20 @@ export function spawnAsync(command, args) {
 export function checkBinary(bin) {
 	let binary = spawnSync('command', ['-v', bin], { shell: true })
 	return !binary.status
+}
+
+/**
+ * Get json data of gist from the official API
+ * @param {string} gistID The ID of the Github Gist
+ * @returns {Promise<GithubApiResponse>}
+ */
+export async function getGistFromAPI(gistID) {
+	const gistApiUrl = `https://api.github.com/gists/${gistID}`
+	const response = await fetch(gistApiUrl, { headers: { 'User-Agent': 'create-new-monorepo' } })
+	if (!response.ok) {
+		throw new Error(`Failed to fetch gist: ${response.status} ${response.statusText}`)
+	}
+	return response.json()
 }
 
 /**

@@ -1,4 +1,4 @@
-import { execAsync, setNpmScript, spawnAsync } from '../utils/functions.js'
+import { execAsync, setNpmScript, spawnAsync, getGistFromAPI } from '../utils/functions.js'
 
 /**
  * Create the main package.json
@@ -12,6 +12,36 @@ async function createPackageJson({ workspaces = ['packages', 'utils'] } = {}) {
 	for (let [indx, dir] of workspaces.entries()) {
 		await spawnAsync('npm', ['pkg', 'set', `workspaces[${indx}]=${dir}/*`])
 		await spawnAsync('mkdir', [`${dir}`])
+	}
+}
+
+/** @typedef {'.editorconfig'|'.gitattributes'|'.gitignore'|'.prettierignore'|'.prettierrc.json'|'.prettierrc.json'|'eslint.config.js'|'lefthook.yml'} FileName */
+/**
+ * Fetches template files from a GitHub Gist and applies them to the project
+ * @param {string} gistId - The ID of the GitHub Gist
+ * @param {FileName[]} fileNames - Array of file names to fetch from the Gist
+ * @returns {Promise<void>}
+ */
+async function genConfigFilesFromGistTemplates(gistId, fileNames = []) {
+	const fs = await import('node:fs/promises')
+
+	try {
+		const gistData = await getGistFromAPI(gistId)
+
+		// If no specific files requested, get all files from gist
+		const filesToFetch = fileNames.length > 0 ? fileNames : Object.keys(gistData.files)
+
+		// Download and write each file
+		for (const fileName of filesToFetch) {
+			if (gistData.files[fileName]) {
+				const fileContent = gistData.files[fileName].content
+				await fs.writeFile(fileName, fileContent)
+				// console.log(`Created ${fileName} from gist template.`)
+			}
+		}
+	} catch (error) {
+		console.error(`Error: fetching templates from gist went wrong: ${error.message}`)
+		//throw error
 	}
 }
 
@@ -98,4 +128,10 @@ async function initFrontendOfChoice({
 	await setNpmScript({ name: `start:${packageName}`, cmd: `npm run dev -w ${packageName}` })
 }
 
-export { createPackageJson, initTokens, initBackendOfChoice, initFrontendOfChoice }
+export {
+	createPackageJson,
+	genConfigFilesFromGistTemplates,
+	initTokens,
+	initBackendOfChoice,
+	initFrontendOfChoice,
+}
