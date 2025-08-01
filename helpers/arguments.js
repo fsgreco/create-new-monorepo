@@ -9,4 +9,9 @@ const options = {
 }
 const { values, positionals } = parseArgs({ options, strict: false })
 
-export { values as options, positionals as commands }
+// this excludes the next node in the abstract syntax tree
+// prettier-ignore
+export { 
+	values as options, 
+	positionals as commands 
+}
