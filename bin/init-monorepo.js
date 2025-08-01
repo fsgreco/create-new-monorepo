@@ -1,13 +1,15 @@
 #! /usr/bin/env node
+// @ts-check
 import fs from 'node:fs/promises'
 import inquirer from 'inquirer'
 import ora from 'ora'
-import { checkBinary, setNpmScript, spawnAsync } from '../utils/functions.js'
+import { checkBinary, createMainReadme, setNpmScript, spawnAsync } from '../utils/functions.js'
 import {
 	createPackageJson,
 	initTokens,
 	initFrontendOfChoice,
 	initBackendOfChoice,
+	genConfigFilesFromGistTemplates,
 } from '../helpers/scaffold-functions.js'
 import { options, commands } from '../helpers/arguments.js'
 import {
@@ -19,6 +21,13 @@ import {
 	printNewLine,
 	printSeparator,
 } from '../utils/prints.js'
+import { showBunnySign } from 'bunny-sign'
+
+await showBunnySign([
+	`Hello there ${process.env.USER || 'friend'}`,
+	`I heard you want to create a monorepo`,
+	"Well, let's get it started...",
+])
 
 // TODO if argument is --default or -d do not ask any question
 const choosesDefault = options.default
@@ -30,6 +39,7 @@ const chosenFrontend = options.frontend
 //console.debug({chosenDir, choosesDefault, chosenBackend, chosenFrontend})
 //console.log('\n')
 
+printNewLine()
 // The first argument will be the project name. or --project or -p also
 if (chosenDir) {
 	const directory = options.project || commands[0]
@@ -82,7 +92,7 @@ if (answers.change_workspaces === false) {
 	│   └── tokens
 	└── package.json
 	
-Proceeding...\n`)
+Proceeding...`)
 }
 
 printNewLine()
@@ -135,6 +145,12 @@ if (chosenFrontend && frontends.includes(chosenFrontend)) {
 	})
 }
 
+let helper = await inquirer.prompt({
+	type: 'confirm',
+	name: 'answer',
+	message: 'Do you want light design-tokens for helper modules?',
+})
+
 let spinner = ora()
 
 try {
@@ -146,49 +162,92 @@ try {
 		`Created ${inGreenBold('main package.json')} - monorepo with workspaces: ${inGoldBold(Object.values(workspaces))}.`
 	)
 
-	spinner.start(`Scaffolding Tokens package inside ${workspaces.secondary} workspace`)
-	await initTokens(workspaces.secondary, 'tokens', '@fsg')
-	spinner.succeed(`Created Tokens library.\n`)
+	if (helper.answer) {
+		spinner.start(`Scaffolding Tokens package inside ${workspaces.secondary} workspace`)
+		await initTokens(workspaces.secondary, 'tokens', '@fsg')
+		spinner.succeed(`Created Tokens library.`)
+	}
 
 	if (backend.choice !== 'none') {
 		spinner.start(`Scaffolding ${backend.choice} app inside ${workspaces.main} workspace`)
 		await initBackendOfChoice({ workspace: workspaces.main, choice: backend.choice })
-		spinner.succeed(`Created ${inGreenBold(backend.choice)} package.\n`)
+		spinner.succeed(`Created ${inGreenBold(backend.choice)} package.`)
 	}
 
 	if (frontend.choice !== 'none') {
 		spinner.start(`Scaffolding ${frontend.choice} frontend inside ${workspaces.main} workspace`)
 		await initFrontendOfChoice({ workspace: workspaces.main, template: frontend.choice })
-		spinner.succeed(`Created ${inGreenBold(frontend.choice)} frontend package (with Vite).\n`)
+		spinner.succeed(`Created ${inGreenBold(frontend.choice)} frontend package (with Vite).`)
 	}
 
 	let initInstructions = [chosenDir && `cd ${chosenDir}`]
 
-	if (!(frontend.choice === 'none' && backend.choice === 'none')) {
-		// main scaffolding process is done. Do you want to install dependencies or you'll do it by hand
-		let installDeps = await inquirer.prompt({
-			type: 'confirm',
-			name: 'answer',
-			message: 'Main scaffolding process is done.\nDo you want to install dependencies right away?',
-		})
+	// if (!(frontend.choice === 'none' && backend.choice === 'none')) {
+	// 	// main scaffolding process is done. Do you want to install dependencies or you'll do it by hand
+	// 	let installDeps = await inquirer.prompt({
+	// 		type: 'confirm',
+	// 		name: 'answer',
+	// 		message: 'Do you want to install dependencies right away?',
+	// 	})
 
-		initInstructions.push(!installDeps.answer && `npm install`)
+	// 	if (installDeps.answer === true) {
+	// 		spinner.start('Installing dependencies...')
+	// 		await spawnAsync('npm', ['install'])
+	// 		spinner.succeed(`Initialized project and installed dependencies.`)
+	// 	} else { initInstructions.push(`npm install`) }
 
-		if (installDeps.answer === true) {
-			spinner.start('Installing dependencies...')
-			await spawnAsync('npm', ['install'])
-			spinner.succeed(`Initialized project and installed dependencies.`)
-		}
+	// }
+	spinner.start('Installing dependencies...')
+	await spawnAsync('npm', ['install'])
+	spinner.succeed(`Initialized project and installed dependencies.`)
 
-		// TODO create last main 'start' better (check and switch whenever be and fe are none )
-		await setNpmScript({ name: 'start', cmd: 'npm run start:backend & npm run start:frontend' })
+	// TODO move this choices up to be more central, so you can use it also above:
+
+	/** @type {import("../utils/functions.js").Choices} */
+	let choices = {
+		frontend: frontend.choice === 'none' ? null : frontend.choice,
+		backend: backend.choice === 'none' ? null : frontend.choice,
+		helper: helper.answer ? 'helper' : null,
 	}
+
+	let startCmd = []
+	if (choices.backend) startCmd.push('npm run start:backend')
+	if (choices.frontend) startCmd.push('npm run start:frontend')
+	if (startCmd.length > 0) await setNpmScript({ name: 'start', cmd: startCmd.join(' & ') })
+
+	// spinner.start("Setting npm scripts for normalization (lint and prettier).")
+	// await setNpmScript({name: 'lint', cmd: 'eslint . --fix'})
+	// await setNpmScript({name: 'normalize', cmd: "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'" })
+	// await setNpmScript({name: 'check', cmd: "npm run normalize && npm run lint"})
+	// await spawnAsync('npm', ['install', 'eslint', '@eslint/js', 'globals','eslint-config-prettier', 'prettier'])
+	// spinner.succeed("Generated npm scripts for linting and formatting files.")
+	spinner.start('Setting general configuration files...')
+	await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
+		'.editorconfig',
+		'.gitattributes',
+		'.gitignore' /* '.prettierrc.json','.prettierignore','eslint.config.js' */,
+	])
+	spinner.succeed('Configuration files in place')
+
+	spinner.start('Creating main Readme file')
+	await createMainReadme(workspaces, choices)
+	spinner.succeed('Created main README file.')
 
 	printSeparator()
 
 	initInstructions.push('npm start')
 	const instructions = initInstructions.filter(val => typeof val === 'string').join(' && ')
-	console.info(`${checkmark} Everything done.\nNow simply run ${inBlueBold(instructions)}.\nHappy development 🚀`)
+	spinner.succeed('Everything done.')
+	console.info(`Now simply run ${inBlueBold(instructions)}.`)
+
+	await showBunnySign(
+		[
+			`Please read the docs at the root of the project.`,
+			`The Readme file contain some basic instructions for the packages of your choice.`,
+			`Happy development 🚀`,
+		],
+		{ persist: true }
+	)
 } catch (error) {
 	console.error(error)
 	process.exit(1)
@@ -196,5 +255,4 @@ try {
 
 /* TODOS */
 
-// TODO - add gitignore
-// TODO - generate readme file (customized according to what user choose)
+// TODO - add gitignore dinamically generated (WIP generator)
