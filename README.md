@@ -68,4 +68,4 @@ This will configure lefthook to automatically format and lint your code before e
 
 ## Notes: 
 
-If you choose `django` or `laravel` as a backend service you will need to have installed the requirements (either `django-admin` or php `composer` in the device). This CLI will check if they are installed and exit with an error explanation if not. Due to this ckecking process (that uses POSIX-compliant system) this CLI will not work on Windows at the moment (in the future proper compatibility will be implemented).
+If you choose `django` or `laravel` as a backend service you will need to have installed the requirements (either `django-admin` or php `composer` in the device). This CLI will check if they are installed and exit with an error explanation if not. Due to this checking process (that uses POSIX-compliant system) this CLI will not work on Windows at the moment (in the future proper compatibility will be implemented).

@@ -219,7 +219,7 @@ try {
 	/** @type {import("../utils/functions.js").Choices} */
 	let choices = {
 		frontend: frontend.choice === 'none' ? null : frontend.choice,
-		backend: backend.choice === 'none' ? null : frontend.choice,
+		backend: backend.choice === 'none' ? null : backend.choice,
 		helper: helper.answer ? 'helper' : null,
 	}
 
