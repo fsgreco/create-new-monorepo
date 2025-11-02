@@ -6,6 +6,7 @@ const options = {
 	help: { type: 'boolean', short: 'h' },
 	frontend: { type: 'string', short: 'f' },
 	backend: { type: 'string', short: 'b' },
+	'with-linting': { type: 'boolean', short: 'l' },
 }
 const { values, positionals } = parseArgs({ options, strict: false })
 

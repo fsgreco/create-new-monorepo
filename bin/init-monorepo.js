@@ -35,6 +35,7 @@ const choosesDefault = options.default
 const chosenDir = options.project || commands[0]
 const chosenBackend = options.backend
 const chosenFrontend = options.frontend
+const chosenLinting = options['with-linting']
 
 //console.debug({chosenDir, choosesDefault, chosenBackend, chosenFrontend})
 //console.log('\n')
@@ -151,6 +152,18 @@ let helper = await inquirer.prompt({
 	message: 'Do you want light design-tokens for helper modules?',
 })
 
+let linting = { answer: false }
+if (chosenLinting !== undefined) {
+	linting.answer = chosenLinting
+} else {
+	linting = await inquirer.prompt({
+		type: 'confirm',
+		name: 'answer',
+		message: 'Do you want basic linting and formatting setup (ESLint + Prettier + Lefthook)?',
+		default: true,
+	})
+}
+
 let spinner = ora()
 
 try {
@@ -225,9 +238,37 @@ try {
 	await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
 		'.editorconfig',
 		'.gitattributes',
-		'.gitignore' /* '.prettierrc.json','.prettierignore','eslint.config.js' */,
+		'.gitignore',
 	])
 	spinner.succeed('Configuration files in place')
+
+	if (linting.answer) {
+		spinner.start('Setting up linting and formatting...')
+		await spawnAsync('npm', [
+			'install',
+			'-D',
+			'eslint',
+			'@eslint/js',
+			'globals',
+			'eslint-config-prettier',
+			'prettier',
+			'lefthook',
+		])
+		await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
+			'.prettierrc.json',
+			'.prettierignore',
+			'eslint.config.js',
+			'lefthook.yml',
+		])
+		await setNpmScript({ name: 'normalize', cmd: "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'" })
+		await setNpmScript({ name: 'lint', cmd: 'eslint . --fix' })
+		await setNpmScript({ name: 'check', cmd: 'npm run normalize && npm run lint' })
+		await setNpmScript({
+			name: 'setup:githooks',
+			cmd: 'lefthook install && echo "✓ Git hooks enabled with lefthook"',
+		})
+		spinner.succeed('Linting and formatting setup complete.')
+	}
 
 	spinner.start('Creating main Readme file')
 	await createMainReadme(workspaces, choices)

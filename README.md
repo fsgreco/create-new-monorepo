@@ -30,11 +30,12 @@ This will create a `django` app under `/backend` and a `react` app under `/front
 
 The available options are:
 
-|   Command  | shorthand |                                                             example                                                    |
-|:----------:|:---------:|------------------------------------------------------------------------------------------------------------------------|
-|  --project |     -p    | `npm create new-monorepo -- -p my-project`  <br>Alternatively use an argument:<br>`npm create new-monorepo my-project` |
-| --frontend |     -f    | `npm create new-monorepo my-project -- -f react`                                                                       |
-|  --backend |     -b    | `npm create new-monorepo my-project -- -b django`                                                                      |
+|   Command      | shorthand |                                                             example                                                    |
+|:--------------:|:---------:|------------------------------------------------------------------------------------------------------------------------|
+|  --project     |     -p    | `npm create new-monorepo -- -p my-project`  <br>Alternatively use an argument:<br>`npm create new-monorepo my-project` |
+| --frontend     |     -f    | `npm create new-monorepo my-project -- -f react`                                                                       |
+|  --backend     |     -b    | `npm create new-monorepo my-project -- -b django`                                                                      |
+| --with-linting |     -l    | `npm create new-monorepo my-project -- --with-linting` (skips prompt, enables linting)                                 |
 
 ### Available templates:
 At the moment this are the available templates: 
@@ -46,6 +47,24 @@ At the moment this are the available templates:
 | Backend                                                                       |
 |-------------------------------------------------------------------------------|
 | `laravel`, `django`, `fastify`, `none`                                        |
+
+## Linting and Formatting
+
+During setup, you'll be asked if you want basic linting and formatting tools. If you answer **yes** (or use `--with-linting`), the CLI will:
+
+- Install **ESLint**, **Prettier**, and **Lefthook** as dev dependencies
+- Generate configuration files (`.prettierrc.json`, `.prettierignore`, `eslint.config.js`, `lefthook.yml`)
+- Add npm scripts: `normalize`, `lint`, `check`, and `setup:githooks`
+
+### Enabling Git Hooks
+
+Lefthook is installed but not enabled by default. To enable git hooks (pre-commit linting/formatting), run:
+
+```sh
+npm run setup:githooks
+```
+
+This will configure lefthook to automatically format and lint your code before each commit.
 
 ## Notes: 
 
