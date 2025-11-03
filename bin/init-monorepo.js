@@ -161,7 +161,7 @@ if (choosesTooling && typeof choosesTooling === 'boolean') {
 	tooling = await inquirer.prompt({
 		type: 'confirm',
 		name: 'answer',
-		message: 'Do you want basic tooling for linting and formatting (ESLint + Prettier)?',
+		message: 'Do you want basic normalization tooling for linting and formatting (ESLint + Prettier)?',
 		default: true,
 	})
 }
@@ -252,18 +252,7 @@ try {
 	if (startCmd.length > 0) await setNpmScript({ name: 'start', cmd: startCmd.join(' & ') })
 
 	if (tooling.answer) {
-		spinner.start('Setting up linting and formatting...')
-
-		await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
-			'.prettierrc.json',
-			'.prettierignore',
-			'eslint.config.js',
-			'lefthook.yml',
-		])
-		await setNpmScript({ name: 'lint', cmd: 'eslint . --fix' })
-		await setNpmScript({ name: 'normalize', cmd: "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'" })
-		await setNpmScript({ name: 'check', cmd: 'npm run normalize && npm run lint' })
-		await setNpmScript({ name: 'setup:githooks', cmd: 'lefthook install' })
+		spinner.start('Installing linting and formatting tools...')
 
 		await spawnAsync('npm', [
 			'install',
@@ -275,6 +264,20 @@ try {
 			'prettier',
 			'lefthook',
 		])
+
+		spinner.succeed('Installed linting and formatting packages.')
+		spinner.start('Setting up configuration and scripts...')
+
+		await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
+			'.prettierrc.json',
+			'.prettierignore',
+			'eslint.config.js',
+			'lefthook.yml',
+		])
+		await setNpmScript({ name: 'lint', cmd: 'eslint . --fix' })
+		await setNpmScript({ name: 'normalize', cmd: "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'" })
+		await setNpmScript({ name: 'check', cmd: 'npm run normalize && npm run lint' })
+		await setNpmScript({ name: 'setup:githooks', cmd: 'lefthook install' })
 
 		spinner.succeed('Setup completed: npm scripts for linting and formatting in place.')
 	}

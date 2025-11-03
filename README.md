@@ -35,7 +35,7 @@ The available options are:
 |  --project     |     -p    | `npm create new-monorepo -- -p my-project`  <br>Alternatively use an argument:<br>`npm create new-monorepo my-project` |
 | --frontend     |     -f    | `npm create new-monorepo my-project -- -f react`                                                                       |
 |  --backend     |     -b    | `npm create new-monorepo my-project -- -b django`                                                                      |
-| --tooling      |     -t    | `npm create new-monorepo my-project -- -t` (skips prompt, enables linting and formating)                        |
+| --tooling      |     -t    | `npm create new-monorepo my-project -- -t` (skips prompt, enables linting and formatting)                        |
 
 ### Available templates:
 At the moment this are the available templates: 
@@ -58,15 +58,15 @@ During setup, you'll be asked if you want basic linting and formatting tools. If
 
 ### Enabling Git Hooks
 
-Lefthook is a helper that will automatically format and lint your code before each commit.
+Lefthook will automatically format and lint your code before each commit.
 
-It will be installed as devDependency.  
-In case you do not use `npm`, to enable the git hooks (pre-commit linting/formatting), run:
+It will be installed as devDependency. To enable the git hooks (pre-commit linting/formatting), run:
 
 ```sh
 npm run setup:githooks
 ```
-Note: this will work only if you initialize the project with `git`. Also, if you use `npm` then the hooks will be enabled automatically whenever you run `npm install` (since `lefthook` has a built in `postbuild` command in its package.json).
+
+Note: this will work only if you initialize the project with `git`. If you use `npm`, the hooks will also be enabled automatically whenever you run `npm install` (lefthook has a built-in `postinstall` hook in its package.json).
 
 
 ## Notes: 
