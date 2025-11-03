@@ -15,7 +15,7 @@ async function createPackageJson({ workspaces = ['packages', 'utils'] } = {}) {
 	}
 }
 
-/** @typedef {'.editorconfig'|'.gitattributes'|'.gitignore'|'.prettierignore'|'.prettierrc.json'|'.prettierrc.json'|'eslint.config.js'|'lefthook.yml'} FileName */
+/** @typedef {'.editorconfig'|'.gitattributes'|'.gitignore'|'.npmignore'|'.prettierignore'|'.prettierrc.json'|'.prettierrc.json'|'eslint.config.js'|'lefthook.yml'} FileName */
 /**
  * Fetches template files from a GitHub Gist and applies them to the project
  * @param {string} gistId - The ID of the GitHub Gist

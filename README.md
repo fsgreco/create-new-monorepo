@@ -35,7 +35,7 @@ The available options are:
 |  --project     |     -p    | `npm create new-monorepo -- -p my-project`  <br>Alternatively use an argument:<br>`npm create new-monorepo my-project` |
 | --frontend     |     -f    | `npm create new-monorepo my-project -- -f react`                                                                       |
 |  --backend     |     -b    | `npm create new-monorepo my-project -- -b django`                                                                      |
-| --with-linting |     -l    | `npm create new-monorepo my-project -- --with-linting` (skips prompt, enables linting)                                 |
+| --tooling      |     -t    | `npm create new-monorepo my-project -- -t` (skips prompt, enables linting and formating)                        |
 
 ### Available templates:
 At the moment this are the available templates: 
@@ -50,7 +50,7 @@ At the moment this are the available templates:
 
 ## Linting and Formatting
 
-During setup, you'll be asked if you want basic linting and formatting tools. If you answer **yes** (or use `--with-linting`), the CLI will:
+During setup, you'll be asked if you want basic linting and formatting tools. If you answer **yes** (or use `--tooling`), the CLI will:
 
 - Install **ESLint**, **Prettier**, and **Lefthook** as dev dependencies
 - Generate configuration files (`.prettierrc.json`, `.prettierignore`, `eslint.config.js`, `lefthook.yml`)
@@ -58,13 +58,16 @@ During setup, you'll be asked if you want basic linting and formatting tools. If
 
 ### Enabling Git Hooks
 
-Lefthook is installed but not enabled by default. To enable git hooks (pre-commit linting/formatting), run:
+Lefthook is a helper that will automatically format and lint your code before each commit.
+
+It will be installed as devDependency.  
+In case you do not use `npm`, to enable the git hooks (pre-commit linting/formatting), run:
 
 ```sh
 npm run setup:githooks
 ```
+Note: this will work only if you initialize the project with `git`. Also, if you use `npm` then the hooks will be enabled automatically whenever you run `npm install` (since `lefthook` has a built in `postbuild` command in its package.json).
 
-This will configure lefthook to automatically format and lint your code before each commit.
 
 ## Notes: 
 
