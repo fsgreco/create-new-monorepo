@@ -16,6 +16,7 @@ import {
 	checkmark,
 	inBlueBold,
 	inGoldBold,
+	inGreen,
 	inGreenBold,
 	inRedBold,
 	printNewLine,
@@ -166,6 +167,12 @@ if (choosesTooling && typeof choosesTooling === 'boolean') {
 	})
 }
 
+console.info('')
+
+/** Creation Phase */
+
+const genConfigFiles = genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74')
+
 let spinner = ora()
 
 try {
@@ -208,12 +215,12 @@ try {
 	let initInstructions = [chosenDir && `cd ${chosenDir}`]
 
 	spinner.start('Setting general configuration files...')
-	await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
-		'.gitignore',
-		'.npmignore',
-		'.editorconfig',
-		'.gitattributes',
-	])
+
+	/** @type {import('../helpers/scaffold-functions.js').FileName[]} */
+	let defaultConfigFiles = ['.gitignore', '.npmignore', '.editorconfig', '.gitattributes']
+	if (tooling.answer) defaultConfigFiles.push('lefthook.yml')
+	await genConfigFiles(defaultConfigFiles)
+
 	spinner.succeed('Configuration files in place')
 
 	// if (!(frontend.choice === 'none' && backend.choice === 'none')) {
@@ -254,26 +261,15 @@ try {
 	if (tooling.answer) {
 		spinner.start('Installing linting and formatting tools...')
 
-		await spawnAsync('npm', [
-			'install',
-			'-D',
-			'eslint',
-			'@eslint/js',
-			'globals',
-			'eslint-config-prettier',
-			'prettier',
-			'lefthook',
-		])
+		const npmPackages = ['eslint', '@eslint/js', 'globals', 'eslint-config-prettier', 'prettier', 'lefthook']
+		await spawnAsync('npm', ['install', '-D', ...npmPackages])
 
 		spinner.succeed('Installed linting and formatting packages.')
+
 		spinner.start('Setting up configuration and scripts...')
 
-		await genConfigFilesFromGistTemplates('a00a9e453c5aafa219829ad5d2eeaa74', [
-			'.prettierrc.json',
-			'.prettierignore',
-			'eslint.config.js',
-			'lefthook.yml',
-		])
+		await genConfigFiles(['.prettierrc.json', '.prettierignore', 'eslint.config.js'])
+
 		await setNpmScript({ name: 'lint', cmd: 'eslint . --fix' })
 		await setNpmScript({ name: 'normalize', cmd: "prettier --write '**/*.{js,ts,cjs,mjs,jsx,tsx}'" })
 		await setNpmScript({ name: 'check', cmd: 'npm run normalize && npm run lint' })
@@ -292,6 +288,13 @@ try {
 	const instructions = initInstructions.filter(val => typeof val === 'string').join(' && ')
 	spinner.succeed('Everything done.')
 	console.info(`Now simply run ${inBlueBold(instructions)}.`)
+
+	if (['react', 'react-ts'].includes(frontend.choice)) {
+		console.info(
+			'\nTips:\n- Since you are using React, you could try my generator `nx-tool` to help you with boilerplate:'
+		)
+		console.info(inGreen('  npm i -D nx-tool'))
+	}
 
 	await showBunnySign(
 		[

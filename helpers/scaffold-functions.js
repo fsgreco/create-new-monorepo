@@ -15,35 +15,36 @@ async function createPackageJson({ workspaces = ['packages', 'utils'] } = {}) {
 	}
 }
 
-/** @typedef {'.editorconfig'|'.gitattributes'|'.gitignore'|'.npmignore'|'.prettierignore'|'.prettierrc.json'|'.prettierrc.json'|'eslint.config.js'|'lefthook.yml'} FileName */
+/** @typedef {'.editorconfig'|'.gitattributes'|'.gitignore'|'.npmignore'|'.prettierignore'|'.prettierrc.json'|'.prettierrc.json'|'eslint.config.js'|'lefthook.yml'} FileName Array of file names to fetch from the Gist */
 /**
  * Fetches template files from a GitHub Gist and applies them to the project
  * @param {string} gistId - The ID of the GitHub Gist
- * @param {FileName[]} fileNames - Array of file names to fetch from the Gist
- * @returns {Promise<void>}
+ * @returns {(fileNames: Array<FileName>) => Promise<void>}
  */
-async function genConfigFilesFromGistTemplates(gistId, fileNames = []) {
-	const fs = await import('node:fs/promises')
+const genConfigFilesFromGistTemplates =
+	gistId =>
+	async (fileNames = []) => {
+		const fs = await import('node:fs/promises')
 
-	try {
-		const gistData = await getGistFromAPI(gistId)
+		try {
+			const gistData = await getGistFromAPI(gistId)
 
-		// If no specific files requested, get all files from gist
-		const filesToFetch = fileNames.length > 0 ? fileNames : Object.keys(gistData.files)
+			// If no specific files requested, get all files from gist
+			const filesToFetch = fileNames.length > 0 ? fileNames : Object.keys(gistData.files)
 
-		// Download and write each file
-		for (const fileName of filesToFetch) {
-			if (gistData.files[fileName]) {
-				const fileContent = gistData.files[fileName].content
-				await fs.writeFile(fileName, fileContent)
-				// console.log(`Created ${fileName} from gist template.`)
+			// Download and write each file
+			for (const fileName of filesToFetch) {
+				if (gistData.files[fileName]) {
+					const fileContent = gistData.files[fileName].content
+					await fs.writeFile(fileName, fileContent)
+					// console.log(`Created ${fileName} from gist template.`)
+				}
 			}
+		} catch (error) {
+			console.error(`Error: fetching templates from gist went wrong: ${error.message}`)
+			//throw error
 		}
-	} catch (error) {
-		console.error(`Error: fetching templates from gist went wrong: ${error.message}`)
-		//throw error
 	}
-}
 
 async function initTokens(workspace = 'utils', packageName = 'tokens', scope = '') {
 	let scopedName = scope ? `${scope}/${packageName}` : packageName
