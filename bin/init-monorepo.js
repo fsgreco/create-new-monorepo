@@ -10,6 +10,7 @@ import {
 	initFrontendOfChoice,
 	initBackendOfChoice,
 	genConfigFilesFromGistTemplates,
+	initE2EBoilerplate,
 } from '../helpers/scaffold-functions.js'
 import { options, commands } from '../helpers/arguments.js'
 import {
@@ -24,11 +25,13 @@ import {
 } from '../utils/prints.js'
 import { showBunnySign } from 'bunny-sign'
 
-await showBunnySign([
-	`Hello there ${process.env.USER || 'friend'}`,
-	`I heard you want to create a monorepo`,
-	"Well, let's get it started...",
-])
+if (!process.env.DEBUG) {
+	await showBunnySign([
+		`Hello there ${process.env.USER || 'friend'}`,
+		`I heard you want to create a monorepo`,
+		"Well, let's get it started...",
+	])
+}
 
 // TODO if argument is --default or -d do not ask any question
 const choosesDefault = options.default
@@ -37,6 +40,7 @@ const chosenDir = options.project || commands[0]
 const chosenBackend = options.backend
 const chosenFrontend = options.frontend
 const choosesTooling = options.tooling
+const choosesE2E = options.e2e
 
 //console.debug({chosenDir, choosesDefault, chosenBackend, chosenFrontend})
 //console.log('\n')
@@ -149,10 +153,23 @@ if (chosenFrontend && typeof chosenFrontend === 'string' && frontends.includes(c
 	})
 }
 
+let e2e = { answer: false }
+if (choosesE2E && typeof choosesE2E === 'boolean') {
+	e2e = { answer: choosesE2E }
+} else {
+	e2e = await inquirer.prompt({
+		type: 'confirm',
+		name: 'answer',
+		message: 'Do you want to set an e2e package with Playwright boilerplate?',
+		default: false,
+	})
+}
+
 let helper = await inquirer.prompt({
 	type: 'confirm',
 	name: 'answer',
 	message: 'Do you want light design-tokens for helper modules?',
+	default: false,
 })
 
 let tooling = { answer: false }
@@ -190,6 +207,12 @@ try {
 		spinner.succeed(`Created Tokens library.`)
 	} else {
 		await spawnAsync('touch', [workspaces.secondary + '/.gitkeep'])
+	}
+
+	if (e2e.answer) {
+		spinner.start(`Scaffolding Playwright for E2E testing inside ${workspaces.secondary} workspace`)
+		await initE2EBoilerplate(workspaces.secondary, 'e2e')
+		spinner.succeed(`Generated E2E project with Playwright`)
 	}
 
 	if (backend.choice !== 'none') {
@@ -251,6 +274,7 @@ try {
 		backend: backend.choice === 'none' ? null : backend.choice,
 		helper: helper.answer,
 		tooling: tooling.answer,
+		e2e: e2e.answer,
 	}
 
 	let startCmd = []
@@ -296,14 +320,9 @@ try {
 		console.info(inGreen('  npm i -D nx-tool'))
 	}
 
-	await showBunnySign(
-		[
-			`Please read the docs at the root of the project.`,
-			`The Readme file contain some basic instructions for the packages of your choice.`,
-			`Happy development 🚀`,
-		],
-		{ persist: true }
-	)
+	await showBunnySign([`Please read the README file at the root of the project.`, `Happy development 🚀`], {
+		persist: true,
+	})
 } catch (error) {
 	console.error(error)
 	process.exit(1)

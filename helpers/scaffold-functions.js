@@ -61,6 +61,76 @@ async function initTokens(workspace = 'utils', packageName = 'tokens', scope = '
 		await setNpmScript({ name: `build:${packageName}`, cmd: `npm run build -w ${scopedName}` })
 }
 
+async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e') {
+	let playwright = {
+		scaffold: [
+			`npm init playwright@latest -w ${workspace}/${packageName} -- --lang=js --quiet --browser chromium`,
+		],
+		innerScripts: [
+			{ name: 'test:all', cmd: 'npx playwright test' },
+			{ name: 'test:all:ui', cmd: 'npx playwright test --ui' },
+			{ name: 'report', cmd: 'npx playwright show-report' },
+		],
+	}
+
+	for (let cmd of playwright.scaffold) {
+		await execAsync(cmd)
+	}
+
+	for (let script of playwright.innerScripts) {
+		await setNpmScript({ ...script, packageName })
+	}
+
+	let mainWorkspaceScripts = [
+		{ name: 'test', cmd: `npm run test:all -w ${packageName}` },
+		{ name: 'test:ui', cmd: `npm run test:all:ui -w ${packageName}` },
+		{ name: 'test:report', cmd: `npm run report -w ${packageName}` },
+	]
+	for (let script of mainWorkspaceScripts) {
+		await setNpmScript(script)
+	}
+
+	// CUSTOM BOILERPLATE
+	const fs = await import('node:fs/promises')
+	const fixtureFolder = `${workspace}/${packageName}/fixtures`
+	let fixtureContent = `
+	import { test as base, expect } from '@playwright/test'
+	import { HomePage } from '../models/page.home.model'\n
+	export const test = base.extend({
+		page: async ({ page }, use, testInfo) => {
+			/* BEFORE */
+			await use(page)
+			/* AFTER */
+			testInfo.annotations.push({type:'Message', description: 'End test.' + Date.now()})
+		},
+		homePage: async ({ page }, use) => {
+			const home = new HomePage(page)
+			await home.goto()
+			await use(home)
+		},
+	})`
+	await spawnAsync('mkdir', ['-p', fixtureFolder])
+	await fs.writeFile(`${fixtureFolder}/fixtures.custom.js`, fixtureContent)
+
+	const modelsFolder = `${workspace}/${packageName}/models`
+	let homepageContent = `
+	export class HomePage {
+		reloadBtn
+		constructor(page) {
+			this.createNewRuleButton = this.page.getByTestId('button-reload')
+		}
+		async goto() {
+			let url = new URL('', ${process.env.E2E_FRONTEND || 'localhost:4200'})
+			await this.page.goto(url.href)
+		}
+		async reloadPage() {
+			await this.reloadBtn.click()
+		}
+	}`
+	await spawnAsync('mkdir', ['-p', modelsFolder])
+	await fs.writeFile(`${modelsFolder}/page.home.model.js`, homepageContent)
+}
+
 let djangoInnerScripts = [
 	{ name: 'boot:startproject', cmd: 'django-admin startproject project .' },
 	{ name: 'boot:startapp', cmd: 'python3 manage.py startapp api' },
@@ -133,6 +203,7 @@ export {
 	createPackageJson,
 	genConfigFilesFromGistTemplates,
 	initTokens,
+	initE2EBoilerplate,
 	initBackendOfChoice,
 	initFrontendOfChoice,
 }

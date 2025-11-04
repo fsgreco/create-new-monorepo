@@ -134,7 +134,7 @@ export function createReadme(mainTitle = '', sections) {
 	return composeMarkdown([mainSection, ...(sections ? sections : [])])
 }
 
-/** @typedef {{frontend: string|null;backend: string|null;helper: boolean; tooling: boolean }} Choices */
+/** @typedef {{frontend: string|null;backend: string|null;helper: boolean; tooling: boolean; e2e: boolean }} Choices */
 
 // TODO this should be drastically improved - less hardcoded and general workspace map should be functional
 /**
@@ -165,6 +165,17 @@ export async function createMainReadme(workspaces, choices) {
 				'```bash\nnpm run build:tokens\n```',
 				'Check also [the design tokens documentation][ws:tokens] for more information.\n',
 				`[ws:tokens]: ./${workspaces.secondary}/tokens/README.md\n`,
+			],
+		},
+		e2e: {
+			title: 'End-to-end testing via Playwright',
+			lines: [
+				`The E2E testing packages is located at ${workspaces.secondary}`,
+				'To execute a headless test simply run `npm test`',
+				'If you want to run the test with UI then run:',
+				'```bash\nnpm run test:ui\n```',
+				'To visualize the report you an also run:',
+				'```bash\nnpm run test:report\n```',
 			],
 		},
 	}
