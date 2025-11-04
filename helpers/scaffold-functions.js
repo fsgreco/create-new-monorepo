@@ -61,6 +61,36 @@ async function initTokens(workspace = 'utils', packageName = 'tokens', scope = '
 		await setNpmScript({ name: `build:${packageName}`, cmd: `npm run build -w ${scopedName}` })
 }
 
+async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e') {
+	let playwright = {
+		scaffold: [
+			`npm init playwright@latest -w ${workspace}/${packageName} -- --lang=js --quiet --browser chromium`,
+		],
+		innerScripts: [
+			{ name: 'test:all', cmd: 'npx playwright test' },
+			{ name: 'test:all:ui', cmd: 'npx playwright test --ui' },
+			{ name: 'report', cmd: 'npx playwright show-report' },
+		],
+	}
+
+	for (let cmd of playwright.scaffold) {
+		await execAsync(cmd)
+	}
+
+	for (let script of playwright.innerScripts) {
+		await setNpmScript({ ...script, packageName })
+	}
+
+	let mainWorkspaceScripts = [
+		{ name: 'test', cmd: `npm run test:all -w ${packageName}` },
+		{ name: 'test:ui', cmd: `npm run test:all:ui -w ${packageName}` },
+		{ name: 'test:report', cmd: `npm run report -w ${packageName}` },
+	]
+	for (let script of mainWorkspaceScripts) {
+		await setNpmScript(script)
+	}
+}
+
 let djangoInnerScripts = [
 	{ name: 'boot:startproject', cmd: 'django-admin startproject project .' },
 	{ name: 'boot:startapp', cmd: 'python3 manage.py startapp api' },
@@ -133,6 +163,7 @@ export {
 	createPackageJson,
 	genConfigFilesFromGistTemplates,
 	initTokens,
+	initE2EBoilerplate,
 	initBackendOfChoice,
 	initFrontendOfChoice,
 }

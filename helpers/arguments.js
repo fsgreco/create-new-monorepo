@@ -7,6 +7,7 @@ const options = {
 	frontend: { type: 'string', short: 'f' },
 	backend: { type: 'string', short: 'b' },
 	tooling: { type: 'boolean', short: 't' },
+	e2e: { type: 'boolean', short: 'e' },
 }
 const { values, positionals } = parseArgs({ options, strict: false })
 
