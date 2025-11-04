@@ -22,7 +22,7 @@ It will launch the frontend and backend server.
 
 ## Available options
 
-You can pass options preceeded by `--` to avoid interactivity: 
+You can pass options preceded by `--` to avoid interactivity: 
 ```sh
 npm create new-monorepo <project-name> -- -b django -f react
 ```
