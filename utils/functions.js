@@ -134,7 +134,7 @@ export function createReadme(mainTitle = '', sections) {
 	return composeMarkdown([mainSection, ...(sections ? sections : [])])
 }
 
-/** @typedef {{frontend: string|null;backend: string|null;helper: string|null;}} Choices */
+/** @typedef {{frontend: string|null;backend: string|null;helper: boolean; tooling: boolean }} Choices */
 
 // TODO this should be drastically improved - less hardcoded and general workspace map should be functional
 /**

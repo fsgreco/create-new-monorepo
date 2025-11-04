@@ -11,6 +11,7 @@ const colors = new Map([
 
 export const inDarkGray = chalk.rgb(...colors.get('darkGray'))
 export const inMediumGray = chalk.rgb(...colors.get('mediumGray'))
+export const inGreen = chalk.rgb(...colors.get('green'))
 export const inRed = chalk.rgb(...colors.get('red'))
 export const inRedBold = chalk.bold.rgb(...colors.get('red'))
 export const inBlueBold = chalk.bold.rgb(...colors.get('blue'))
