@@ -55,8 +55,8 @@ if (chosenDir) {
 }
 
 let workspaces = {
-	main: 'apps',
-	secondary: 'helpers',
+	main: 'packages',
+	secondary: 'utils',
 }
 
 let firstRound = [
@@ -104,7 +104,7 @@ Proceeding...`)
 printNewLine()
 
 // Choose your backend ['laravel', 'django']
-let backends = ['laravel', 'django', 'fastify', 'none']
+let backends = ['laravel', 'django', 'fastify', 'fastify-ts', 'none']
 let backend
 if (chosenBackend && backends.includes(chosenBackend)) {
 	backend = {
@@ -116,7 +116,7 @@ if (chosenBackend && backends.includes(chosenBackend)) {
 		name: 'choice',
 		message: 'Choose your backend:',
 		choices: backends,
-		default: 'django',
+		default: 'fastify',
 	})
 }
 
@@ -161,7 +161,18 @@ if (choosesE2E && typeof choosesE2E === 'boolean') {
 		type: 'confirm',
 		name: 'answer',
 		message: 'Do you want to set an e2e package with Playwright boilerplate?',
-		default: false,
+		default: true,
+	})
+}
+
+let e2eLanguage = { choice: 'js' }
+if (e2e.answer) {
+	e2eLanguage = await inquirer.prompt({
+		type: 'list',
+		name: 'choice',
+		message: 'Do you want to use Playwright with Javascript or Typescript?',
+		choices: ['js', 'ts'],
+		default: 'js',
 	})
 }
 
@@ -211,8 +222,8 @@ try {
 
 	if (e2e.answer) {
 		spinner.start(`Scaffolding Playwright for E2E testing inside ${workspaces.secondary} workspace`)
-		await initE2EBoilerplate(workspaces.secondary, 'e2e')
-		spinner.succeed(`Generated E2E project with Playwright`)
+		await initE2EBoilerplate(workspaces.secondary, 'e2e', e2eLanguage.choice)
+		spinner.succeed(`Created ${inGoldBold('playwright')} project (E2E testing)`)
 	}
 
 	if (backend.choice !== 'none') {
@@ -224,14 +235,6 @@ try {
 	if (frontend.choice !== 'none') {
 		spinner.start(`Scaffolding ${frontend.choice} frontend inside ${workspaces.main} workspace`)
 		await initFrontendOfChoice({ workspace: workspaces.main, template: frontend.choice })
-
-		if (['react', 'react-ts'].includes(frontend.choice)) {
-			await spawnAsync('npm', ['install', '-w', 'frontend', '-D', 'jsdom', '@testing-library/react'])
-
-			// TODO tips at the end (after npm start suggestion)
-			//console.log("You are using React, in case you need help with boilerplate give a try to `nx-tool`")
-		}
-
 		spinner.succeed(`Created ${inGreenBold(frontend.choice)} frontend package (with Vite).`)
 	}
 
@@ -264,6 +267,13 @@ try {
 
 	spinner.start('Installing dependencies...')
 	await spawnAsync('npm', ['install'])
+
+	if (frontend.choice && ['react', 'react-ts'].includes(frontend.choice)) {
+		await spawnAsync('npm', ['install', '-D', 'vitest', 'jsdom', '@testing-library/react', '-w', 'frontend'])
+
+		await setNpmScript({ name: 'test', cmd: 'vitest', packageName: 'frontend' })
+		await setNpmScript({ name: 'test:frontend', cmd: `npm test -w frontend` })
+	}
 	spinner.succeed(`Initialized project and installed dependencies.`)
 
 	// TODO move this choices up to be more central, so you can use it also above:
