@@ -61,10 +61,10 @@ async function initTokens(workspace = 'utils', packageName = 'tokens', scope = '
 		await setNpmScript({ name: `build:${packageName}`, cmd: `npm run build -w ${scopedName}` })
 }
 
-async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e') {
+async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e', lang) {
 	let playwright = {
 		scaffold: [
-			`npm init playwright@latest -w ${workspace}/${packageName} -- --lang=js --quiet --browser chromium`,
+			`npm init playwright@latest -w ${workspace}/${packageName} -- --lang=${lang} --quiet --browser chromium --install-deps`,
 		],
 		innerScripts: [
 			{ name: 'test:all', cmd: 'npx playwright test' },
@@ -110,7 +110,7 @@ async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e') {
 		},
 	})`
 	await spawnAsync('mkdir', ['-p', fixtureFolder])
-	await fs.writeFile(`${fixtureFolder}/fixtures.custom.js`, fixtureContent)
+	await fs.writeFile(`${fixtureFolder}/fixtures.custom.${lang}`, fixtureContent)
 
 	const modelsFolder = `${workspace}/${packageName}/models`
 	let homepageContent = `
@@ -120,7 +120,7 @@ async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e') {
 			this.createNewRuleButton = this.page.getByTestId('button-reload')
 		}
 		async goto() {
-			let url = new URL('', ${process.env.E2E_FRONTEND || 'localhost:4200'})
+			let url = new URL('', '${process.env.E2E_FRONTEND || 'localhost:4200'}')
 			await this.page.goto(url.href)
 		}
 		async reloadPage() {
@@ -128,7 +128,7 @@ async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e') {
 		}
 	}`
 	await spawnAsync('mkdir', ['-p', modelsFolder])
-	await fs.writeFile(`${modelsFolder}/page.home.model.js`, homepageContent)
+	await fs.writeFile(`${modelsFolder}/page.home.model.${lang}`, homepageContent)
 }
 
 let djangoInnerScripts = [
@@ -150,7 +150,7 @@ let laravelInnerScript = [
 ]
 
 let fastify = {
-	scaffold: ['npx fastify-cli generate . --esm --integrate'],
+	scaffoldCmd: 'npx fastify-cli generate . --esm --integrate',
 	innerScripts: [
 		// { name: 'prepare', cmd: 'if [ ! -d \"routes\" ]; then fastify generate . --integrate --esm && npm i ; fi' },
 	], // fastify already creates an npm start script
@@ -162,7 +162,7 @@ let backendScripts = new Map([
 	['fastify', fastify.innerScripts],
 ])
 
-async function initBackendOfChoice({ workspace, choice = 'django', packageName = 'backend' } = {}) {
+async function initBackendOfChoice({ workspace = 'packages', choice = 'django', packageName = 'backend' } = {}) {
 	let workspaceCmds = [
 		`npm init -y -w ${workspace}/${packageName}`,
 		`npm pkg set type=module -w ${packageName}`,
@@ -172,10 +172,9 @@ async function initBackendOfChoice({ workspace, choice = 'django', packageName =
 		await execAsync(cmd)
 	}
 
-	if (choice === 'fastify') {
-		for (let cmd of fastify.scaffold) {
-			await execAsync(`cd ${workspace}/${packageName} && ${cmd}`)
-		}
+	if (choice === 'fastify' || choice === 'fastify-ts') {
+		let cmd = fastify.scaffoldCmd + (choice === 'fastify-ts' ? ` --lang=ts` : '')
+		await execAsync(`cd ${workspace}/${packageName} && ${cmd}`)
 	}
 
 	let innerScripts = backendScripts.get(choice)
