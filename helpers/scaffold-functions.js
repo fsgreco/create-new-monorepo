@@ -160,6 +160,7 @@ let backendScripts = new Map([
 	['laravel', laravelInnerScript],
 	['django', djangoInnerScripts],
 	['fastify', fastify.innerScripts],
+	['fastify-ts', fastify.innerScripts],
 ])
 
 async function initBackendOfChoice({ workspace = 'packages', choice = 'django', packageName = 'backend' } = {}) {
