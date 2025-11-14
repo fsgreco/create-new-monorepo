@@ -64,7 +64,7 @@ async function initTokens(workspace = 'utils', packageName = 'tokens', scope = '
 async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e', lang) {
 	let playwright = {
 		scaffold: [
-			`npm init playwright@latest -w ${workspace}/${packageName} -- --lang=${lang} --quiet --browser chromium --install-deps`,
+			`npm init playwright@latest -w ${workspace}/${packageName} -- --lang=${lang} --quiet --browser chromium`,
 		],
 		innerScripts: [
 			{ name: 'test:all', cmd: 'npx playwright test' },
