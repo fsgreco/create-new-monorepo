@@ -57,8 +57,8 @@ async function initTokens(workspace = 'utils', packageName = 'tokens', scope = '
 	for (let cmd of setTokensWorkspace) {
 		await execAsync(cmd)
 	}
-	await setNpmScript({ name: 'build', cmd: 'style-dictionary build', packageName: scopedName }),
-		await setNpmScript({ name: `build:${packageName}`, cmd: `npm run build -w ${scopedName}` })
+	;(await setNpmScript({ name: 'build', cmd: 'style-dictionary build', packageName: scopedName }),
+		await setNpmScript({ name: `build:${packageName}`, cmd: `npm run build -w ${scopedName}` }))
 }
 
 async function initE2EBoilerplate(workspace = 'utils', packageName = 'e2e', lang) {
