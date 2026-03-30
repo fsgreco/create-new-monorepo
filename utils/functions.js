@@ -182,7 +182,7 @@ export async function createMainReadme(workspaces, choices) {
 
 	const sections = Object.entries(generalWorkspaceSectionsMap)
 		.filter(([key]) => choices[key])
-		.map(([_, val]) => val)
+		.map(([, val]) => val)
 
 	// DEBUG
 	// console.log({sections})
