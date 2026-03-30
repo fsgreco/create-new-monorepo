@@ -14,6 +14,11 @@ jobs:
 
       - name: Checkout project
         uses: actions/checkout@v6
+      - name: Setup project
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
       # - name: Publish on npm
       #   id: publish-npm
@@ -22,14 +27,12 @@ jobs:
       #     token: ${{ secrets.NPM_TOKEN }}
       - name: Publish on npm
         id: publish-npm
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-        run: npm publish
+        run: |
+          echo "version=$(npm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
+          npm publish
 
       - name: Notify new version via Telegram
-        if: steps.publish-npm.outputs.type 
+        if: success() 
         run: |
           curl -s \
           -d "chat_id=${{ secrets.CHAT_ID }}" \
