@@ -25,14 +25,29 @@ jobs:
       #   uses: JS-DevTools/npm-publish@v4
       #   with:
       #     token: ${{ secrets.NPM_TOKEN }}
+
+      # DON'T REPLICATE: this is just experimental - you should use push: tags: - "v*" instead
+      - name: Check if new version exist 
+        id: check-version
+        run: |
+          VERSION=$(npm pkg get version | tr -d '"')
+          PKG=$(npm pkg get name | tr -d '"')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if npm view "$PKG@$VERSION" > /dev/null 2>&1; then 
+            echo "Version $VERSION already exist."
+            echo "outcome=skip" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          
       - name: Publish on npm
         id: publish-npm
+        if: steps.check-version.outputs.outcome != 'skip'
         run: |
-          echo "version=$(npm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
+          echo "version=$(npm pkg get version)" >> "$GITHUB_OUTPUT"
           npm publish
 
       - name: Notify new version via Telegram
-        if: success() 
+        if: steps.publish-npm.outcome == 'success'
         run: |
           curl -s \
           -d "chat_id=${{ secrets.CHAT_ID }}" \
